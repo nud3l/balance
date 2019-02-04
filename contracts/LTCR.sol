@@ -4,7 +4,7 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract LTCR is Ownable {
     uint256 _minCollateral;
-    uint8 _decimals;
+    uint256 _decimals;
 
     uint8[4] _layers = [1,2,3,4];
     mapping (uint8 => uint256[2]) _bounds;
@@ -49,7 +49,7 @@ contract LTCR is Ownable {
     }
 
     function setFactor(uint8 layer, uint256 factor) public onlyOwner returns (bool) {
-        require(factor > 10^_decimals, "factor needs to be above 1.0");
+        require(factor >= (10 ** _decimals), "factor needs to be above or equal to 1.0");
         require(layer > 0, "layer 0 is reserved");
         _factors[layer] = factor;
         return true;
@@ -96,7 +96,7 @@ contract LTCR is Ownable {
     }
 
     function registerAgent(address agent, uint256 collateral) public returns (bool) {
-        require(collateral >= _minCollateral * (_factors[_layers[_layers.length - 1]] / 10^_decimals), "too little collateral");
+        require(collateral >= _minCollateral * (_factors[_layers[_layers.length - 1]] / (10 ** _decimals)), "too little collateral");
         _assignments[agent] = _layers[_layers.length - 1];
         
         emit RegisterAgent(agent, collateral);
