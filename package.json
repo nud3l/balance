@@ -1,0 +1,33 @@
+{
+  "name": "layered-tcr",
+  "version": "0.0.1",
+  "description": "A truffle package for a layered TCR.",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "openzeppelin-solidity": "^2.1.2",
+    "truffle-assertions": "^0.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nud3l/layered-tcr.git"
+  },
+  "keywords": [
+    "TCR",
+    "tokens",
+    "ranking",
+    "colalteral"
+  ],
+  "author": "Dominik Harz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nud3l/layered-tcr/issues"
+  },
+  "homepage": "https://github.com/nud3l/layered-tcr#readme"
+}
