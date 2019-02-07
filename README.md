@@ -7,32 +7,32 @@
 
 # Dynamic Collateral Adjustments
 
-We are introducing a mechanism to dynamically adjust collateral in the case of external events depending on the contributions of agents towards a cryptoeconomic layer 2 protocol. The mechanism design philosophy is borrowed from [Layered Token Curated Registry (TCR)](https://blog.oceanprotocol.com/the-layered-tcr-56cc5b4cdc45). However, we make significant changes to the idea of the registry. The idea is that agents are assigned to layers based on their actions, which in turn determine the amount of collateral they have to provide. The more "desired" actions an agent performs, the less collateral the agent has to provide to participate in the cryptoeconomic layer 2 protocol.
+We are introducing a mechanism to dynamically adjust collateral in the case of external events depending on the contributions of agents towards a cryptoeconomic layer 2 protocol. The mechanism design philosophy is borrowed from [Layered Token Curated Registry (TCR)](https://blog.oceanprotocol.com/the-layered-tcr-56cc5b4cdc45). However, we make significant changes to the idea of the registry. The idea is that agents are assigned to layers based on their actions, which in turn determine the amount of collateral they have to provide. The more "desired" actions an agent performs, the less collateral the agent has to provide to participate in the protocol.
 
 
 ## Problem
 
 Layer 2 protocols on Ethereum typically use collateral to prevent agents to misbehave.
 This includes for example Plasma, payment channels (Raiden, PERUN), verifiable computation (TrueBit) or cross-chain protocols like XClaim.
-There are two problems with the current approach to collateral in Layer 2 protocols:
+There are two problems with the current approach to collateral:
 
-- **Dependency on outside events**: The amount of collateral provided is constant for some time period `t`. In case of outside events, there exists no incentive to update the collateral. 
-- **Over-collateralisation**: Outside events can occur at any time. Hence, the collateral needs to take any future events into account and needs to be higher in anticipation of such events.
+- **Unknown risk:** In protocols like TrueBit the risk of a solver providing a wrong solution is non-trivial to quantify. It depends on the subjective importance of the computation to be correct. Hence, it is not possible to set an objectively *correct* amount of collateral.
+- **Dependency on outside events**: The amount of collateral provided is constant for some time period `t`. In case of outside events, there exists no incentive to update the collateral. Hence, the collateral needs to take any future events into account and needs to be higher in anticipation of such events.
 
-## Layered TCR
+## Verifiable Layered TCR
 
-The idea of a Layered TCR (LTCR) is to assign agents into layers based on their actions.
-A cryptoeconomic protocols has in an abstract sense a list of desired and undesired actions.
-In case an agent performs an undesired action, the action is usually "slashed", i.e. its collateral is destroyed or the "victim" of the undesired action is refunded with that collateral. 
+The idea of a Verifiable Layered TCR (VLTCR) is to assign agents into layers based on their actions.
+A cryptoeconomic protocol has in an abstract sense a list of desired and undesired actions.
+In case an agent performs an undesired action, its collateral is usually "slashed", i.e. the collateral is destroyed or the "victim" of the undesired action is refunded with that collateral. 
 Contrary, if the agent performs a desired action, it is usually rewarded with a fee that the consumer of the service is paying (e.g. a solver in TrueBit). 
-However, this is a black an white option.
+However, this is a black and white option.
 
 ### Basic feedback mechanism 
 *What if we could make use of this action classification to build a feedback mechanism?*
 
 Assume you are receiving points as an agent if you perform agents that are part of the desired actions.
 The smart contract implementing the protocol is aware of all these actions.
-Thereby, the agents actions are directly translated into a ranking (i.e. a layer).
+Thereby, the agents actions are directly translated into a score for performing this action.
 
 The more contributions the higher the ranking. The higher the ranking, the less collateral the agent has to provide.
 We end up with a construct like this:
@@ -64,7 +64,7 @@ To summarize:
 ### Periodic updates to the registry
 **How are agents sorted into layers?**
 
-The LTCR smart contract maintains the registry.
+The VLTCR smart contract maintains the registry.
 Agents can collect points that determine if they:
 
 1. Stay in the same layer.
