@@ -13,8 +13,8 @@ Mechanism parameters:
 
 - Payout function
 - Amount of collateral
-- Amount of desired actions by an agent
-- Amount of undesired actions by an agent
+- Valuation of receiving an action
+- Valuation of performing an action
 
 TCR parameters:
 
