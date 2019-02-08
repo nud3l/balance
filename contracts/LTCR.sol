@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract LTCR is Ownable {
     uint256 _minCollateral;
@@ -19,8 +19,7 @@ contract LTCR is Ownable {
     uint256 _start;
     uint256 _end;
 
-    constructor(uint256 mincollateral) public {
-        _minCollateral = mincollateral;
+    constructor() public {
         _decimals = 3; // e.g. a factor of 1500 is equal to 1.5 times the collateral
         // wait for 100 blocks to reorg
         _blockperiod = 10;
@@ -32,6 +31,15 @@ contract LTCR is Ownable {
 
     function getLayers() public view returns(uint8[4] memory) {
         return _layers;
+    }
+
+    // ##################
+    // ### Colalteral ###
+    // ##################
+
+    function setCollateral(uint256 mincollateral) public onlyOwner returns (bool) {
+        _minCollateral = mincollateral;
+        return true;
     }
 
     // ##############
