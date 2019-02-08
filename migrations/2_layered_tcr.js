@@ -1,6 +1,5 @@
-var LTCR = artifacts.require("./LTCR.sol");
+var Mechanism = artifacts.require("./Mechanism.sol");
 
 module.exports = function(deployer) {
-    let minCollateral = 1;
-    deployer.deploy(LTCR, minCollateral);
+    deployer.deploy(Mechanism);
 };

@@ -1,15 +1,15 @@
-const LTCR = artifacts.require("LTCR");
+const Mechanism = artifacts.require("Mechanism");
 const BN = web3.utils.BN;
 
-contract("LTCR: layers", async (accounts) => {
+contract("Mechanism: layers", async (accounts) => {
 
 
-    beforeEach("wait for deployed LTCR", async () => {
-        ltcr = await LTCR.deployed();
+    beforeEach("wait for deployed Mechanism", async () => {
+        mechanism = await Mechanism.deployed();
     })
 
     it("query available layers", async () => {
-        let layers = await ltcr.getLayers.call();
+        let layers = await mechanism.getLayers.call();
         assert.isArray(layers);
 
         for (i = 0; i < 4; i++) {
