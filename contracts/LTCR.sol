@@ -24,7 +24,7 @@ contract LTCR is Ownable {
         // wait for 100 blocks to reorg
         _blockperiod = 10;
     }
-
+    
     // ##############
     // ### LAYERS ###
     // ##############
