@@ -6,10 +6,10 @@ contract LTCR is Ownable {
     uint256 _minCollateral;
     uint256 _decimals;
 
-    uint8[4] _layers = [1,2,3,4];
+    uint8[] _layers;
     mapping (uint8 => uint256[2]) _bounds;
-
     mapping (uint8 => uint256) _factors;
+
     mapping (address => uint8) _assignments;
     mapping (address => uint256) _scores;
 
@@ -21,7 +21,7 @@ contract LTCR is Ownable {
 
     constructor() public {
         _decimals = 3; // e.g. a factor of 1500 is equal to 1.5 times the collateral
-        // wait for 100 blocks to reorg
+        // wait for 10 blocks to reorg
         _blockperiod = 10;
     }
     
@@ -29,12 +29,18 @@ contract LTCR is Ownable {
     // ### LAYERS ###
     // ##############
 
-    function getLayers() public view returns(uint8[4] memory) {
+    function getLayers() public view returns(uint8[] memory) {
         return _layers;
     }
 
+    function setLayers(uint8[] memory layers) public returns (bool) {
+         // set layers
+        _layers = layers;
+        return true;
+    }
+
     // ##################
-    // ### Colalteral ###
+    // ### Collateral ###
     // ##################
 
     function setCollateral(uint256 mincollateral) public onlyOwner returns (bool) {
@@ -105,7 +111,7 @@ contract LTCR is Ownable {
 
     function registerAgent(address agent, uint256 collateral) public returns (bool) {
         require(collateral >= _minCollateral * (_factors[_layers[_layers.length - 1]] / (10 ** _decimals)), "too little collateral");
-        _assignments[agent] = _layers[_layers.length - 1];
+        _assignments[agent] = _layers[0];
         
         emit RegisterAgent(agent, collateral);
         
