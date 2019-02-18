@@ -1,5 +1,5 @@
-var Mechanism = artifacts.require("./Mechanism.sol");
+var LTCR = artifacts.require("./LTCR.sol");
 
-module.exports = function(deployer) {
-    deployer.deploy(Mechanism);
+module.exports = function (deployer) {
+    deployer.deploy(LTCR);
 };
