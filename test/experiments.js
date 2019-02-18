@@ -52,13 +52,22 @@ contract("LTCR: test setup", async (accounts) => {
     ]
 
     let min_collateral = 1;
-    let period = 10;
+    let periods = 10;
 
     // payout vector for each agent
     let payout = new Array(num_agents);
 
     // possible lost interest on collateral due to trading etc.
     let interest_on_collateral = "110";
+
+    let period_counter = 0;
+    // array of agent records
+    // format: [periods | agent_id | behaviour | layer | rewards]
+    // periods: int
+    // behaviour: honest = 0 | malicious = 1
+    // layer: int
+    // rewards: int
+    let experiment_record = [];
 
     beforeEach("wait for deployed ltcr", async function () {
         ltcr = await LTCR.deployed();
@@ -136,7 +145,7 @@ contract("LTCR: test setup", async (accounts) => {
         });
     });
 
-    it("start the period", async function () {
+    it("start the periods", async function () {
         let start_tcr = await ltcr.startPeriod({
             from: owner
         });
@@ -144,8 +153,25 @@ contract("LTCR: test setup", async (accounts) => {
         truffleAssert.eventEmitted(start_tcr, "StartedPeriod");
     });
 
+    let counter = 0;
+    agents.forEach(function (agent) {
+        it("get initial assignment " + agent, async function () {
+            let get_assignment = await ltcr.getAssignment.call(agent);
+            this_assignment = get_assignment.toString();
+            assert.deepEqual(this_assignment, "1");
+            // format: [periods | agent_id | behaviour | layer | rewards]
+            experiment_record[counter] = [period_counter, counter, 0, this_assignment, 0];
+            counter++;
+        });
+    });
+
+    it("write initial records to csv", async function () {
+        console.log(experiment_record);
+        helpers.writeToCSV("test.csv", experiment_record);
+    })
+
     it("Check that agents are assinged to the lowest layer", async function () {
-        helpers.generateBlocksGanache(period);
+        helpers.generateBlocksGanache(periods);
 
         let update_ranking = await ltcr.updateRanking(agents, {
             from: owner

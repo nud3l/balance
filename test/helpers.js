@@ -1,3 +1,27 @@
+var fs = require('fs');
+
+function prepareCSV(data) {
+    // format: period | agent_id | behaviour | layer | rewards
+    // period: int
+    // behaviour: honest = 0 | malicious = 1
+    // layer: int
+    // rewards: int
+    var data_string = "";
+    for (i = 0; i < data.length; i++) {
+        let agent = data[i];
+        for (j = 0; j < agent.length; j++) {
+            if (j != agent.length - 1) {
+                data_string += agent[j] + ",";
+            } else {
+                data_string += agent[j];
+            }
+        }
+        data_string += "\n"
+    }
+
+    return data_string;
+}
+
 module.exports = {
     convertToUsd: function (gasCost) {
         // gas price conversion
@@ -24,5 +48,20 @@ module.exports = {
                 });
             }
         });
+    },
+    writeToCSV: function (file, data) {
+        let path = "./experiments/results/" + file;
+        data_string = prepareCSV(data);
+        try {
+            // fd = fs.openSync(path, 'a');
+            var stream = fs.createWriteStream(path, {
+                flags: 'w'
+            });
+            stream.write(data_string, 'utf8');
+        } catch (err) {
+            console.log(err);
+        } finally {
+            stream.end();
+        }
     },
 };
