@@ -6,20 +6,22 @@ module.exports = {
 
         return gasCost * web3.utils.fromWei(gas_price, "ether") * eth_usd;
     },
-    generateBlocksGanache: function(number) {
+    generateBlocksGanache: function (number) {
         return new Promise((resolve, reject) => {
-        // ganache uses evm_mine method to generate new blocks
+            // ganache uses evm_mine method to generate new blocks
             for (var i = 0; i < number; i++) {
                 web3.currentProvider.send({
                     jsonrpc: "2.0",
                     method: "evm_mine",
                     id: 123
-                    }, (err, result) => {
-                        if (err) { return reject(err); }
-                        const newBlockHash = web3.eth.getBlock('latest').hash;
-            
-                        return resolve(newBlockHash)
-                    });
+                }, (err, result) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    const newBlockHash = web3.eth.getBlock('latest').hash;
+
+                    return resolve(newBlockHash)
+                });
             }
         });
     },
