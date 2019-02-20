@@ -1,11 +1,12 @@
+var PD = require("probability-distributions");
 var param_helpers = require("../parameter-helpers");
 
 module.exports = {
     // CSV PARAMETERS
-    csvCostHeading: [
-        ["agents", "layers", "gas_update", "usd_update", "gas_register", "usd_register"]
+    csvTestHeading: [
+        ["period", "agent_id", "behaviour", "layer", "rewards", "utility"]
     ],
-    cost_file: "cost.csv",
+    test_file: "test.csv",
 
     // LVCR PARAMETERs
     min_collateral: 1,
@@ -17,20 +18,24 @@ module.exports = {
     num_layers: param_helpers.num_layers(),
     layer_ids: param_helpers.layer_ids,
     layers: param_helpers.layers,
-    num_agents: param_helpers.num_agents(), // max around 1000
+    num_agents: 3,
     actions: [{
             id: 0,
-            reward: "100" // commit to protocol
+            reward: "200" // commit to protocol
         },
         {
             id: 1,
-            reward: "200" // perform action
+            reward: "10" // perform action
         },
         {
             id: 2,
             reward: "600" // update collateral event
         }
     ],
+    // performed_actions: [
+    //     PD.rint(1000, 1, num_agents), // sample order of 1000 actions from agent 1 to num_agents
+    //     PD.rint(1000, 1, 1), // sample which action in performed
+    // ],
 
     // COST PARAMETERS
     eth_usd: 106, // 
