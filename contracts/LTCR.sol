@@ -12,7 +12,7 @@ contract LTCR is Ownable {
 
     mapping (address => uint8) _assignments;
     mapping (address => uint256) _scores;
-
+    mapping (address => uint256) _deposits;
     mapping (uint256 => uint256) _rewards;
 
     uint256 _blockperiod;
@@ -109,9 +109,15 @@ contract LTCR is Ownable {
         return _assignments[agent];
     }
 
+    function getAgentColalteral(address agent) public view returns (uint256) {
+        require(_assignments[agent] > 0, "agent not assigned to layer");
+        return _deposits[agent];
+    }
+
     function registerAgent(address agent, uint256 collateral) public returns (bool) {
-        require(collateral >= _minCollateral * (_factors[_layers[_layers.length - 1]] / (10 ** _decimals)), "too little collateral");
+        require(collateral >= _minCollateral * (_factors[_layers[0]] / (10 ** _decimals)), "too little collateral");
         _assignments[agent] = _layers[0];
+        _deposits[agent] = collateral;
         
         emit RegisterAgent(agent, collateral);
         
