@@ -12,48 +12,72 @@ module.exports = {
 
     periods: 10,
 
-    layer_ids: [1, 2, 3, 4],
-    layers: [{
-            id: 1,
-            factor: "1750",
-            bound: ["0", "200"]
-        },
-        {
-            id: 2,
-            factor: "1500",
-            bound: ["200", "400"]
-        },
-        {
-            id: 3,
-            factor: "1250",
-            bound: ["400", "600"]
-        },
-        {
-            id: 4,
-            factor: "1000",
-            bound: ["600", "0"]
-        }
-    ],
-    num_agents: 3,
+    num_layers: num_layers(),
+    layer_ids: layer_ids,
+    layers: layers,
+    num_agents: num_agents(), // max around 1000
     actions: [{
             id: 0,
-            reward: "200" // commit to protocol
+            reward: "100" // commit to protocol
         },
         {
             id: 1,
-            reward: "10" // perform action
+            reward: "200" // perform action
         },
         {
             id: 2,
             reward: "600" // update collateral event
         }
     ],
-    performed_actions: [
-        PD.rint(1000, 1, num_agents), // sample order of 1000 actions from agent 1 to num_agents
-        PD.rint(1000, 1, 1), // sample which action in performed
-    ],
 
     // COST PARAMETERS
     eth_usd: 106, // 
     gas_price: "9", // gwei
+}
+
+function num_layers() {
+    let step = 10;
+    let max = 101;
+    let layers = [];
+    for (i = 1; i <= max; i += step) {
+        layers.push(i);
+    }
+    return layers;
+}
+
+function num_agents() {
+    let step = 50;
+    let max = 1001;
+    let agents = [];
+    for (i = 1; i <= max; i += step) {
+        agents.push(i);
+    }
+    return agents;
+}
+
+
+function layer_ids(number) {
+    let ids = [];
+    for (i = 1; i <= number; i++) {
+        ids.push(i);
+    }
+    return ids;
+}
+
+function layers(number) {
+    let layers = [];
+    let counter = 200;
+    let lower = 0;
+    let upper = 200;
+    let factor = "1750" // does not matter for cost experiment
+    for (i = 1; i <= number; i++) {
+        layers.push({
+            id: i,
+            factor: factor,
+            bound: [lower.toString(), upper.toString()]
+        });
+        lower += counter;
+        upper += counter;
+    }
+    return layers;
 }
