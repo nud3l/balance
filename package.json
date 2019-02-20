@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.1.2",
+    "probability-distributions": "^0.9.1",
     "truffle-assertions": "^0.7.2"
   },
   "devDependencies": {},
