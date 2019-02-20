@@ -1,11 +1,5 @@
-var PD = require("probability-distributions");
-
 module.exports = {
     // CSV PARAMETERS
-    csvTestHeading: [
-        ["period", "agent_id", "behaviour", "layer", "rewards", "utility"]
-    ],
-    test_file: "test.csv",
     csvCostHeading: [
         ["agents", "layers", "gas_update", "usd_update", "gas_register", "usd_register"]
     ],

@@ -1,12 +1,10 @@
 const LTCR = artifacts.require("LTCR");
 
 const truffleAssert = require('truffle-assertions');
-var helpers = require('./helpers');
+var helpers = require('../helpers');
 var parameters = require('./parameters');
 
-const BN = web3.utils.BN;
-
-contract("LTCR: test setup", async (accounts) => {
+contract("LVCR: cost experiments", async (accounts) => {
     let owner = accounts[0];
     let agents = accounts.slice(1, parameters.num_agents + 1);
 
@@ -18,15 +16,6 @@ contract("LTCR: test setup", async (accounts) => {
     let periods = parameters.periods;
     let period_counter = 0;
 
-    // array of agent records
-    // format: period | agent_id | behaviour | layer | rewards | utility
-    // period: int
-    // behaviour: honest = 0 | malicious = 1
-    // layer: int
-    // rewards: int
-    // utility: float
-    let experiment_record = [];
-
     // agents, layers, gas_update, usd_update, gas_register, usd_register
     let cost_record = [];
     let gas_update;
@@ -36,7 +25,6 @@ contract("LTCR: test setup", async (accounts) => {
         gas_update = 0;
         gas_register = 0;
 
-        helpers.writeToCSV(parameters.test_file, parameters.csvTestHeading);
         helpers.writeToCSV(parameters.cost_file, parameters.csvCostHeading);
     })
 

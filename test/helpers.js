@@ -6,8 +6,7 @@ module.exports = {
     convertToUsd: function convertToUsd(gasCost) {
         // gas price conversion
         const gas_price = web3.utils.toWei(parameters.gas_price, "gwei");
-        const eth_usd = parameters.eth_usd;
-        return gasCost * web3.utils.fromWei(gas_price, "ether") * eth_usd;
+        return gasCost * web3.utils.fromWei(gas_price, "ether") * parameters.eth_usd;
     },
     generateBlocksGanache: function generateBlocksGanache(number) {
         return new Promise((resolve, reject) => {
@@ -75,4 +74,8 @@ function prepareCSV(data) {
     }
 
     return data_string;
+}
+
+function performedActions(num_agents, profiles) {
+
 }
