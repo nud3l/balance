@@ -55,7 +55,7 @@ contract("LVCR: cost experiments", async (accounts) => {
                     from: owner
                 });
                 assert.isOk(set_layers);
-            })
+            });
 
             it("set min_collateral", async function () {
                 let set_collateral = await ltcr.setCollateral(min_collateral, {

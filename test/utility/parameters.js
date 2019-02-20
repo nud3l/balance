@@ -15,7 +15,7 @@ module.exports = {
 
     periods: 10,
 
-    num_layers: param_helpers.num_layers(),
+    num_layers: param_helpers.num_layers(1, 4, 1),
     layer_ids: param_helpers.layer_ids,
     layers: param_helpers.layers,
     num_agents: 3,
