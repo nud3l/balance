@@ -11,7 +11,7 @@ contract("LTCR: layers", async (accounts) => {
         assert.isOk(set_layers);
     })
 
-    it("query available layers", async () => {
+    xit("query available layers", async () => {
         let layers = await ltcr.getLayers.call();
         assert.isArray(layers);
 

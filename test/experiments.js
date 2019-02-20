@@ -2,72 +2,34 @@ const LTCR = artifacts.require("LTCR");
 
 const truffleAssert = require('truffle-assertions');
 var helpers = require('./helpers');
+var parameters = require('./parameters');
 
 const BN = web3.utils.BN;
 
 contract("LTCR: test setup", async (accounts) => {
     let owner = accounts[0];
-    let num_agents = 10;
-    let agents = accounts.slice(1, num_agents + 1);
+    let agents = accounts.slice(1, parameters.num_agents + 1);
 
-    let layer_ids = [1, 2, 3, 4];
-    let layers = [{
-            id: 1,
-            factor: "1750",
-            bound: ["100", "200"]
-        },
-        {
-            id: 2,
-            factor: "1500",
-            bound: ["200", "400"]
-        },
-        {
-            id: 3,
-            factor: "1250",
-            bound: ["400", "600"]
-        },
-        {
-            id: 4,
-            factor: "1000",
-            bound: ["600", "0"]
-        }
-    ]
-
-    let actions = [{
-            id: 0,
-            reward: "100"
-        },
-        {
-            id: 1,
-            reward: "200"
-        },
-        {
-            id: 2,
-            reward: "300"
-        },
-        {
-            id: 3,
-            reward: "2000"
-        }
-    ]
-
-    let min_collateral = 1;
-    let periods = 10;
-
-    // payout vector for each agent
-    let payout = new Array(num_agents);
-
-    // possible lost interest on collateral due to trading etc.
-    let interest_on_collateral = "110";
-
+    // parameters
+    let layer_ids = parameters.layer_ids;
+    let layers = parameters.layers;
+    let actions = parameters.actions;
+    let min_collateral = parameters.min_collateral;
+    let periods = parameters.periods;
     let period_counter = 0;
+
     // array of agent records
-    // format: [periods | agent_id | behaviour | layer | rewards]
-    // periods: int
+    // format: period | agent_id | behaviour | layer | rewards | utility
+    // period: int
     // behaviour: honest = 0 | malicious = 1
     // layer: int
     // rewards: int
+    // utility: float
     let experiment_record = [];
+
+    before("set csv heading", async function () {
+        helpers.writeToCSV(parameters.filename, parameters.csvHeading);
+    })
 
     beforeEach("wait for deployed ltcr", async function () {
         ltcr = await LTCR.deployed();
@@ -95,7 +57,7 @@ contract("LTCR: test setup", async (accounts) => {
             let get_factor = await ltcr.getFactor.call(layer.id);
             this_factor = get_factor.toString();
 
-            assert.deepEqual(this_factor, layer.factor);
+            assert.equal(this_factor, layer.factor);
         })
     });
 
@@ -125,23 +87,23 @@ contract("LTCR: test setup", async (accounts) => {
             let get_reward = await ltcr.getReward.call(action.id);
             this_reward = get_reward.toString();
 
-            assert.deepEqual(this_reward, action.reward);
+            assert.equal(this_reward, action.reward);
         })
     });
 
     agents.forEach(function (agent) {
         it("register agent " + agent, async function () {
-            let register_agent = await ltcr.registerAgent(agent, min_collateral * layers[0].factor, {
+            let register_agent = await ltcr.registerAgent(agent, helpers.getCollateral(layer_ids[0]), {
                 from: agent
             });
 
             truffleAssert.eventEmitted(register_agent, "RegisterAgent", (event) => {
-                return event.agent == agent && event.collateral == (min_collateral * layers[0].factor)
+                return event.agent == agent && event.collateral == (helpers.getCollateral(layer_ids[0]))
             });
 
             let get_assignment = await ltcr.getAssignment.call(agent);
             this_assignment = get_assignment.toString();
-            assert.deepEqual(this_assignment, "1");
+            assert.equal(this_assignment, "1");
         });
     });
 
@@ -153,24 +115,29 @@ contract("LTCR: test setup", async (accounts) => {
         truffleAssert.eventEmitted(start_tcr, "StartedPeriod");
     });
 
-    let counter = 0;
     agents.forEach(function (agent) {
         it("get initial assignment " + agent, async function () {
+            let agent_id = agents.indexOf(agent);
             let get_assignment = await ltcr.getAssignment.call(agent);
             this_assignment = get_assignment.toString();
-            assert.deepEqual(this_assignment, "1");
-            // format: [periods | agent_id | behaviour | layer | rewards]
-            experiment_record[counter] = [period_counter, counter, 0, this_assignment, 0];
-            counter++;
+            assert.equal(this_assignment, "1");
+            // format: [periods | agent_id | behaviour | layer | rewards | utility ]
+            experiment_record[agent_id] = [
+                period_counter, // period
+                agent_id, // agent_id
+                0, // behaviour
+                Number(this_assignment), // layer
+                0, // rewards
+                helpers.getUtility(helpers.getCollateral(Number(this_assignment))) // utility
+            ];
         });
     });
 
     it("write initial records to csv", async function () {
-        console.log(experiment_record);
-        helpers.writeToCSV("test.csv", experiment_record);
+        helpers.writeToCSV(parameters.filename, experiment_record);
     })
 
-    it("Check that agents are assinged to the lowest layer", async function () {
+    it("Check that agents are assigned to the lowest layer", async function () {
         helpers.generateBlocksGanache(periods);
 
         let update_ranking = await ltcr.updateRanking(agents, {
