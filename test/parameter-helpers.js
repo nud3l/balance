@@ -32,8 +32,8 @@ module.exports = {
                 factor = base_factor;
             } else {
                 factor = max_factor - ((i - 1) / (max - 1) * (max_factor - min_factor));
+                factor = Math.round(factor);
             }
-            console.log(factor);
 
             layers.push({
                 id: i,

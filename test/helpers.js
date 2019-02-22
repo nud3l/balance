@@ -8,8 +8,8 @@ module.exports = {
         let utility = (0 - (collateral * parameters.interest_on_collateral / 100) / 1000);
         return utility;
     },
-    getCollateral: function getCollateral(layer) {
-        let collateral = parameters.min_collateral * parameters.layers[layer - 1].factor;
+    getCollateral: function getCollateral(base_collateral, factor) {
+        let collateral = base_collateral * factor;
         return collateral;
     },
     convertToUsd: convertToUsd,

@@ -4,7 +4,7 @@ const truffleAssert = require('truffle-assertions');
 var helpers = require('../helpers');
 var parameters = require('./parameters');
 
-contract("LVCR: cost experiments", async (accounts) => {
+contract("LVCR: cost experiments", (accounts) => {
     let owner = accounts[0];
 
     let num_agents_array = parameters.num_agents;
@@ -27,15 +27,11 @@ contract("LVCR: cost experiments", async (accounts) => {
 
             // agents, layers, gas_update, usd_update, gas_register, usd_register
             let cost_record = [];
-            let gas_update;
-            let gas_register;
-
+            let gas_update = 0;
+            let gas_register = 0;
 
             before("wait for deployed ltcr", async function () {
                 ltcr = await LTCR.new();
-
-                gas_update = 0;
-                gas_register = 0;
             })
 
             after("write costs to csv", async function () {
@@ -119,12 +115,12 @@ contract("LVCR: cost experiments", async (accounts) => {
 
             agents.forEach(function (agent) {
                 it("register agent " + agent, async function () {
-                    let register_agent = await ltcr.registerAgent(agent, helpers.getCollateral(layer_ids[0]), {
+                    let register_agent = await ltcr.registerAgent(agent, helpers.getCollateral(min_collateral, layers[0].factor), {
                         from: agent
                     });
 
                     truffleAssert.eventEmitted(register_agent, "RegisterAgent", (event) => {
-                        return event.agent == agent && event.collateral == (helpers.getCollateral(layer_ids[0]))
+                        return event.agent == agent && event.collateral == (helpers.getCollateral(min_collateral, layers[0].factor));
                     });
 
                     let get_assignment = await ltcr.getAssignment.call(agent);

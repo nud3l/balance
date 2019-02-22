@@ -14,10 +14,10 @@ module.exports = {
 
     periods: 10,
 
-    num_layers: param_helpers.num_layers(10, 100, 10),
+    num_layers: param_helpers.num_layers(4, 4, 1),
     layer_ids: param_helpers.layer_ids,
     layers: param_helpers.layers,
-    num_agents: param_helpers.num_agents(50, 1000, 50), // max around 1000
+    num_agents: param_helpers.num_agents(5, 1000, 10), // max around 1000
     actions: [{
             id: 0,
             reward: "100" // commit to protocol
