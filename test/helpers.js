@@ -3,9 +3,9 @@ var fs = require('fs');
 var parameters = require('./utility/parameters');
 
 module.exports = {
-    getUtility: function getUtility(collateral) {
+    getUtility: function getUtility(collateral, interest) {
         // utility assume to be 0 -> do not account for payments of protocol
-        let utility = (0 - (collateral * parameters.interest_on_collateral / 100) / 1000);
+        let utility = (0 - (collateral * interest / 100) / 1000);
         return utility;
     },
     getCollateral: function getCollateral(base_collateral, factor) {
@@ -15,6 +15,7 @@ module.exports = {
     convertToUsd: convertToUsd,
     writeToCSV: writeToCSV,
     generateBlocksGanache: generateBlocksGanache,
+    performAction: performAction,
 };
 
 // COST
@@ -85,6 +86,27 @@ function prepareCSV(data) {
     return data_string;
 }
 
-function performedActions(num_agents, profiles) {
+function performAction(agent, type, valuation, locked_collateral, base_factor, interest) {
+    let action = "";
+    action.agent = agent;
+    if (type == "benevolent") {
+        // ALWAYS act in the interest of the protocol
+        action = "comply";
+    } else if (agents[i].type == "rational") {
+        // ALWAYS maximise utility with respect to multiple rounds
+        if (valuation > locked_collateral) {
+            // expected future return
+            if ()
+                action = "cheat"
+        } else if () {}
 
+    } else if (agents[i].type == "malicious") {
+        // ALWAYS try to sabotage the protocol if it is now rational
+        if (valuation >= locked_collateral) {
+            action = "cheat";
+        } else {
+            action = "comply";
+        }
+    }
+    return action;
 }
