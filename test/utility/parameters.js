@@ -19,6 +19,16 @@ module.exports = {
     layer_ids: param_helpers.layer_ids,
     layers: param_helpers.layers,
     num_agents: 3,
+    agent_types: [{
+        id: 0,
+        type: "benevolent"
+    }, {
+        id: 1,
+        type: "rational"
+    }, {
+        id: 2,
+        type: "malicious"
+    }],
     actions: [{
             id: 0,
             reward: "200" // commit to protocol
@@ -32,10 +42,7 @@ module.exports = {
             reward: "600" // update collateral event
         }
     ],
-    // performed_actions: [
-    //     PD.rint(1000, 1, num_agents), // sample order of 1000 actions from agent 1 to num_agents
-    //     PD.rint(1000, 1, 1), // sample which action in performed
-    // ],
+    performed_actions: param_helpers.performed_actions,
 
     // COST PARAMETERS
     eth_usd: 106, // 

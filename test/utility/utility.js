@@ -4,7 +4,6 @@ const truffleAssert = require('truffle-assertions');
 var helpers = require('../helpers');
 var parameters = require('./parameters');
 
-const BN = web3.utils.BN;
 
 contract("LTCR: utility experiments", async (accounts) => {
     let owner = accounts[0];
@@ -23,7 +22,7 @@ contract("LTCR: utility experiments", async (accounts) => {
         let layers = parameters.layers(num_layers_array[j]);
         let actions = parameters.actions;
         let min_collateral = parameters.min_collateral;
-        let periods = parameters.periods;
+        // let periods = parameters.periods;
         let period_counter = 0;
 
         // array of agent records
@@ -103,12 +102,12 @@ contract("LTCR: utility experiments", async (accounts) => {
 
         agents.forEach(function (agent) {
             it("register agent " + agent, async function () {
-                let register_agent = await ltcr.registerAgent(agent, helpers.getCollateral(layer_ids[0]), {
+                let register_agent = await ltcr.registerAgent(agent, helpers.getCollateral(min_collateral, layers[0].factor), {
                     from: agent
                 });
 
                 truffleAssert.eventEmitted(register_agent, "RegisterAgent", (event) => {
-                    return event.agent == agent && event.collateral == (helpers.getCollateral(layer_ids[0]))
+                    return event.agent == agent && event.collateral == (helpers.getCollateral(min_collateral, layers[0].factor))
                 });
 
                 let get_assignment = await ltcr.getAssignment.call(agent);
@@ -140,17 +139,14 @@ contract("LTCR: utility experiments", async (accounts) => {
             helpers.writeToCSV(parameters.test_file, experiment_record);
         })
 
-        it("Update ranking", async function () {
-            helpers.generateBlocksGanache(periods);
+        it("Update assignments", async function () {
+            // helpers.generateBlocksGanache(periods);
 
             let update_ranking = await ltcr.updateRanking({
                 from: owner
             });
 
             truffleAssert.eventEmitted(update_ranking, "UpdatedRanking");
-
-            gas_update += update_ranking.receipt.gasUsed;
-            gas_register = 0;
         })
 
         // parameters.periods.forEach(function () {
