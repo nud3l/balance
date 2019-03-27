@@ -96,9 +96,8 @@ function performAction(agent, type, valuation, locked_collateral, base_factor, i
         // ALWAYS maximise utility with respect to multiple rounds
         if (valuation > locked_collateral) {
             // expected future return
-            if ()
-                action = "cheat"
-        } else if () {}
+            action = "cheat"
+        }
 
     } else if (agents[i].type == "malicious") {
         // ALWAYS try to sabotage the protocol if it is now rational
