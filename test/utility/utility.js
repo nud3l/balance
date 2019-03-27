@@ -92,14 +92,6 @@ contract("LTCR: utility experiments", async (accounts) => {
             })
         });
 
-        it("start the period", async function () {
-            let start_tcr = await ltcr.startPeriod({
-                from: owner
-            });
-
-            truffleAssert.eventEmitted(start_tcr, "StartedPeriod");
-        });
-
         agents.forEach(function (agent) {
             it("register agent " + agent, async function () {
                 let register_agent = await ltcr.registerAgent(agent, helpers.getCollateral(min_collateral, layers[0].factor), {
@@ -142,7 +134,7 @@ contract("LTCR: utility experiments", async (accounts) => {
         it("Update assignments", async function () {
             // helpers.generateBlocksGanache(periods);
 
-            let update_ranking = await ltcr.updateRanking({
+            let update_ranking = await ltcr.curate({
                 from: owner
             });
 

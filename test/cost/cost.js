@@ -105,14 +105,6 @@ contract("LVCR: cost experiments", (accounts) => {
                 })
             });
 
-            it("start the period", async function () {
-                let start_tcr = await ltcr.startPeriod({
-                    from: owner
-                });
-
-                truffleAssert.eventEmitted(start_tcr, "StartedPeriod");
-            });
-
             agents.forEach(function (agent) {
                 it("register agent " + agent, async function () {
                     let register_agent = await ltcr.registerAgent(agent, helpers.getCollateral(min_collateral, layers[0].factor), {
@@ -133,7 +125,7 @@ contract("LVCR: cost experiments", (accounts) => {
                 it("Perform actions", async function () {
                     let get_assignment = await ltcr.getAssignment.call(agent);
                     if (get_assignment != (layer_ids[layer_ids.length - 1])) {
-                        let record_action = await ltcr.recordAction(agent, 1);
+                        let record_action = await ltcr.update(agent, 1);
 
                         if (gas_register < record_action.receipt.gasUsed) {
                             gas_register = record_action.receipt.gasUsed;
@@ -146,11 +138,11 @@ contract("LVCR: cost experiments", (accounts) => {
             })
 
             it("Update assignments", async function () {
-                let update_ranking = await ltcr.updateRanking({
+                let update_ranking = await ltcr.curate({
                     from: owner
                 });
 
-                truffleAssert.eventEmitted(update_ranking, "UpdatedRanking");
+                truffleAssert.eventEmitted(update_ranking, "Curate");
 
                 gas_update = update_ranking.receipt.gasUsed;
             })
