@@ -139,7 +139,8 @@ contract("LVCR: cost experiments", (accounts) => {
 
             it("Update assignments", async function () {
                 let update_ranking = await ltcr.curate({
-                    from: owner
+                    from: owner,
+                    gas: 6721975
                 });
 
                 truffleAssert.eventEmitted(update_ranking, "Curate");
