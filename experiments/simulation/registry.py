@@ -1,12 +1,18 @@
 class Registry:
-    def __init__(self, layers, num_agents):
+    def __init__(self, layers, num_agents, actions):
         self.layers = layers
-        self.actions = [100,0]
+        self.actions = actions
         self.scores = [0] * num_agents
-        self.agent_layer = [0] * num_agent # not in registry 
+        self.agent_layer = [0] * num_agents  # not in registry
 
     def register(self, agent_id):
         self.agent_layer[agent_id] = 1
+
+    def get_factor(self, agent_id):
+        layer = self.agent_layer[agent_id]
+        factor = self.layers[layer]['factor']
+
+        return factor
 
     def update(self, agent_id, action_id):
         action = self.actions[action_id]
@@ -25,13 +31,15 @@ class Registry:
             if layer == 0:
                 i += 1
                 continue
-            
-            if self.score[i] < self.layers[layer].lower:
-                self.agent_layer[i] -= 1
-            elif self.score[i] > self.layers[layer].upper:
-                self.agent_layer[i] += 1
-            
-            self.scores[i] = 0
-            
-            i += 1
 
+            min_layer = 1
+            max_layer = len(self.layers) - 1
+
+            if self.scores[i] < self.layers[layer]['lower'] and layer > min_layer:
+                self.agent_layer[i] -= 1
+            elif self.scores[i] > self.layers[layer]['upper'] and layer < max_layer:
+                self.agent_layer[i] += 1
+
+            self.scores[i] = 0
+
+            i += 1
