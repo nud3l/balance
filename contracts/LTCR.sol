@@ -3,30 +3,35 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract LTCR is Ownable {
-    uint256 _minCollateral;
-    uint256 _decimals;
+    uint256 _minCollateral; // minimum collateral
+    uint256 _decimals; // decimals to calculate collateral factor
 
-    uint8[] _layers;
-    mapping (uint8 => uint256) _lower;
-    mapping (uint8 => uint256) _upper;
-    mapping (uint8 => uint256) _factors;
+    // Implementation of L = (lower, upper, factor)
+    uint8[] _layers; // array of layers, e.g. {1,2,3,4}
+    mapping (uint8 => uint256) _lower; // lower bound of layer
+    mapping (uint8 => uint256) _upper; // upper bound of layer
+    mapping (uint8 => uint256) _factors; // factor of layer
 
-    mapping (address => uint8) _assignments;
-    mapping (address => uint256) _scores;
-    mapping (address => uint256) _deposits;
-    mapping (uint256 => uint256) _rewards;
+    // Implementation of the relevant agreement parameters A = (phi, payment, score, deposits) 
+    mapping (uint256 => uint256) _rewards; // reward (score) for performing an action
+    mapping (address => uint256) _deposits; // amount of deposit
+
+    // Implementation of the registry
+    mapping (uint256 => mapping (address => uint8)) _assignments; // layer assignment by round and agent
+    mapping (uint256 => mapping (address => uint256)) _scores; // score by round and agent
+    uint256 _round; // current round in the protocol
     
-    address[] _agents; // track all agents
-    mapping (address => bool) _remain; // default to false
+    mapping (address => bool) _agents; // track all agents
 
-    uint256 _blockperiod;
-    uint256 _start;
-    uint256 _end;
+    uint256 _blockperiod; // block period until curation
+    uint256 _start; // start of period
+    uint256 _end; // end of period
 
     constructor() public {
         _decimals = 3; // e.g. a factor of 1500 is equal to 1.5 times the collateral
-        // wait for 10 blocks to reorg
-        _blockperiod = 1;
+        _round = 0; // init rounds
+        
+        _blockperiod = 1; // wait for 10 blocks to curate
         _start = block.number;
         _end = block.number + _blockperiod;
     }
@@ -57,10 +62,11 @@ contract LTCR is Ownable {
     // ##############
     // ### FACTOR ###
     // ##############
+    function getAgentFactor(address agent) public view returns (uint256) {      
+        uint8 assignment = getAssignment(agent);
 
-    function getAgentFactor(address agent) public view returns (uint256) {
-        require(_assignments[agent] > 0, "agent not assigned to layer");
-        uint8 assignment = _assignments[agent];
+        require(assignment > 0, "agent not assigned to layer");
+
         return _factors[assignment];
     }
 
@@ -111,32 +117,53 @@ contract LTCR is Ownable {
     // ### AGENT REGISTRY ###
     // ######################
 
-    function getAssignment(address agent) public view returns(uint8) {
-        require(_assignments[agent] > 0, "agent not assigned to layer");
-        return _assignments[agent];
+    function getAssignment(address agent) public view returns(uint8 assignment) {
+        // check if agent is registered
+        if (_agents[agent]) {
+            // check if agent is assigned to a layer in the current round        
+            if (_assignments[_round][agent] == 0) {
+                // check if the agent was assigned to a layer in previous rounds
+                for (uint8 i = 1; i < _layers.length && i < _round; i++) {
+                    if (_assignments[_round - i][agent] > i) {
+                        return _assignments[_round - i][agent] - i;
+                    }
+                }
+                return 1;
+            } else {
+                return _assignments[_round][agent];
+            }
+        } else {
+            return 0;
+        }
     }
 
     function getAgentCollateral(address agent) public view returns (uint256) {
-        require(_assignments[agent] > 0, "agent not assigned to layer");
+        uint8 assignment = getAssignment(agent);
+
+        require(assignment > 0, "agent not assigned to layer");
+
         return _deposits[agent];
     }
 
     function getScore(address agent) public view returns (uint256) {
-        require(_assignments[agent] > 0, "agent not assigned to layer");
-        return _scores[agent];
+        uint8 assignment = getAssignment(agent);
+
+        require(assignment > 0, "agent not assigned to layer");
+
+        return _scores[_round][agent];
     }
 
     function registerAgent(address agent, uint256 collateral) public returns (bool) {
         require(collateral >= _minCollateral * (_factors[_layers[0]] / (10 ** _decimals)), "too little collateral");
         
+        // register agent
+        _agents[agent] = true;
         // asign agent to lowest layer
-        _assignments[agent] = _layers[0];
+        _assignments[_round][agent] = _layers[0];
         // track the deposit
         _deposits[agent] = collateral;
-        // add agent to list to change in next round
-        _agents.push(agent);
         // update the score of the agent
-        _scores[agent] += _rewards[0];
+        _scores[_round][agent] += _rewards[0];
         
         emit RegisterAgent(agent, collateral);
         
@@ -150,15 +177,28 @@ contract LTCR is Ownable {
     // ####################
 
     function update(address agent, uint256 action) public returns (bool) {
-        _scores[agent] += _rewards[action];
+        _scores[_round][agent] += _rewards[action];
 
-        if (_scores[agent] >= _lower[_assignments[agent]] && _scores[agent] <= _upper[_assignments[agent]]) {
-            _remain[agent] = true;
+        // asignment in the current round
+        uint8 assignment = getAssignment(agent);
+
+        require(assignment > 0, "agent not assigned to layer");
+
+        // promote the agent to the next layer
+        if (_scores[_round][agent] >= _upper[assignment] && assignment != _layers.length) {
+            // asignment in the next round
+            _assignments[_round + 1][agent] = assignment + 1;
+        // demote the agent to the previous layer
+        } else if (_scores[_round][agent] <= _lower[assignment] && assignment > 1) {
+            // asignment in the next round
+            _assignments[_round + 1][agent] = assignment - 1;
+        // agent layer remans the same
         } else {
-            _remain[agent] = false;
+            _assignments[_round + 1][agent] = assignment;
         }
+        // 
         
-        emit Update(agent, _rewards[action], _scores[agent]);
+        emit Update(agent, _rewards[action], _scores[_round][agent]);
 
         return true;
     }
@@ -173,28 +213,12 @@ contract LTCR is Ownable {
         _start = block.number;
         _end = block.number + _blockperiod;
 
-        emit Curate(_agents, _start, _end);
+        // switch to the next round
+        _round++;
 
-        // promote or demote _agents
-        for (uint i = 0; i < _agents.length; i++) {
-            if (_remain[_agents[i]] == false) {
-                uint256 score = _scores[_agents[i]];
-                uint8 layer = _assignments[_agents[i]];
-
-                // lower bound check
-                if (layer > 0 && score < _lower[layer]) { 
-                    _assignments[_agents[i]] -= 1;
-                // upper bound check
-                } else if (layer < (_layers.length - 1) && score > _upper[layer]) {
-                    _assignments[_agents[i]] += 1;
-                }
-            }
-            // reset score
-            _scores[_agents[i]] = 0;
-        }
-
+        emit Curate(_round, _start, _end);
         return true;
     }
 
-    event Curate(address[] _agents, uint256 start, uint256 end);
+    event Curate(uint256 round, uint256 start, uint256 end);
 }
