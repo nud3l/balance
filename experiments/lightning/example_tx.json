@@ -1,0 +1,22 @@
+{
+	"channel_id":"612246557287448576",
+	"chan_point":"fb633bca751bca5250e87e345f9006c6eb0964bc9d6660b4212b38718041323e:0",
+	"last_update":1546523649,
+	"node1_pub":"02881a55acfe466dc3698abe31f412260edeff067cafac8d5c26213a7207f19930",
+	"node2_pub":"037eb17d0fee2d20bacea3d78940b40f4ac61a5a7040a23b6e8280c80d7ebfb420",
+	"capacity":"500000",
+	"node1_policy":{
+		"time_lock_delta":144,
+		"min_htlc":"1000",
+		"fee_base_msat":"1000",
+		"fee_rate_milli_msat":"1",
+		"disabled":false
+	},
+	"node2_policy":{
+		"time_lock_delta":144,
+		"min_htlc":"1000",
+		"fee_base_msat":"1000",
+		"fee_rate_milli_msat":"1",
+		"disabled":false
+	}
+}
