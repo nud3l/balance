@@ -149,23 +149,28 @@ def query_blockstream_api(tx_hash, output=False):
             tx_hash, output)
     else:
         query = "https://blockstream.info/api/tx/{}".format(tx_hash)
-    response = requests.get(query)
 
-    if response.status_code != 200:
-        print("API timeout. Waiting 30 seconds")
-        print("----------------------------------------------------------")
-        print(response.text)
-        if "Invalid hash string" in response.text:
-            print(query)
-            print("Skipping ", tx_hash)
+    try:
+        response = requests.get(query)
+
+        if response.status_code != 200:
+            print("API timeout. Waiting 30 seconds")
             print("----------------------------------------------------------")
+            print(response.text)
+            if "Invalid hash string" in response.text:
+                print(query)
+                print("Skipping ", tx_hash)
+                print("----------------------------------------------------------")
+            else:
+                print("----------------------------------------------------------")
+                time.sleep(31)
+                tx = query_blockstream_api(tx_hash, output)
         else:
-            print("----------------------------------------------------------")
-            time.sleep(31)
-            tx = query_blockstream_api(tx_hash, output)
-    else:
-        tx = response.json()
+            tx = response.json()
 
+    except requests.exceptions.ConnectionError:
+        time.sleep(1)
+        tx = query_blockstream_api(tx_hash, output)
     return tx
 
 
