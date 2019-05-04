@@ -1,9 +1,12 @@
 import csv
+import json
 
-closing = {-1: 0,
-           0: 1,
-           1: 2,
-           2: 3}
+closing = {
+    0: 1,
+    1: 2,
+    2: 3
+}
+
 
 counters = [0, 0, 0, 0]
 
@@ -14,7 +17,13 @@ with open('channel_close_status.csv', 'r') as csv_file:
         counter = closing[int(row[1])]
         counters[counter] += 1
 
-print("Still open ", counters[0])
+with open("graph.json") as file:
+    graph = json.load(file)
+    edges = graph["edges"]
+
+counters[0] = len(edges) - counters[1] - counters[2] - counters[3]
+print("Total ", len(edges))
+print("0pen ", counters[0])
 print("Mutual close ", counters[1])
 print("Unilateral close ", counters[2])
 print("Revoked ", counters[3])
