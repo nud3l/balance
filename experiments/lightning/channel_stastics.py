@@ -10,7 +10,7 @@ closing = {
 
 counters = [0, 0, 0, 0]
 
-with open('channel_close_status.csv', 'r') as csv_file:
+with open('channel_close_status_2.csv', 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     next(csv_reader, None)
     for row in csv_reader:

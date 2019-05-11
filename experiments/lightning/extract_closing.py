@@ -3,6 +3,8 @@ import requests
 import csv
 import time
 
+CSV_FILE = 'channel_close_status_2.csv'
+
 
 def read_graph():
     with open("graph.json") as file:
@@ -50,7 +52,7 @@ def detect_channel_closing_variant(funding_transactions):
             funding_outputs = dict()
 
     # get last element from csv
-    with open('channel_close_status.csv', 'r') as csv_file:
+    with open(CSV_FILE, 'r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         channel_status = list(csv_reader)
         last_funding_tx_id = channel_status[-1][0]
@@ -118,7 +120,7 @@ def detect_channel_closing_variant(funding_transactions):
                             revoke_tx = query_blockstream_api(revoke_tx_id)
                             # check if the transactions has been spent before or after the timelock of the closing tx
                             # unilateral close with revoke
-                            if revoke_tx["status"]["block_height"] > (closing_tx["status"]["block_height"] + 144):
+                            if revoke_tx["status"]["block_height"] < (closing_tx["status"]["block_height"] + 144):
                                 result = [funding_tx_id, 2]
 
                     # unilateral close without revoke
@@ -136,7 +138,7 @@ def detect_channel_closing_variant(funding_transactions):
             result = [funding_tx_id, -1]
 
         # write result to csv
-        with open('channel_close_status.csv', 'a') as csv_file:
+        with open(CSV_FILE, 'a') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(result)
 
