@@ -7,9 +7,9 @@
     "test": "test"
   },
   "dependencies": {
-    "openzeppelin-solidity": "^2.1.2",
+    "openzeppelin-solidity": "^2.3.0",
     "probability-distributions": "^0.9.1",
-    "truffle-assertions": "^0.7.2"
+    "truffle-assertions": "^0.9.1"
   },
   "devDependencies": {},
   "scripts": {
