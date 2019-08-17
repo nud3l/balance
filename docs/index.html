@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An overview of the Balance protocol for reducing cryptocurrency deposits">
+    <meta name="author" content="Dominik Harz">
+    <title>Balance: A Protocol to Securely Reduce Cryptocurrency Deposits</title>
+    
+    <!-- CSS
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
+    integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/custom.css">
+
+    <!-- FONT
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+
+    <style>
+        /*
+        When setting the primary font stack, apply it to the Pure grid units along
+        with `html`, `button`, `input`, `select`, and `textarea`. Pure Grids use
+        specific font stacks to ensure the greatest OS/browser compatibility.
+        */
+        html,
+        button,
+        input,
+        select,
+        textarea,
+        .pure-g [class *="pure-u"] {
+            /* Set your content font stack here: */
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div id="main">
+        <div class="header">
+            <h1>Balance</h1>
+            <h2>Securely Reducing Cryptocurrency Deposits</h2>
+            
+            <div class="pure-g">
+                <div class="pure-u-1-3"></div>
+                <div class="pure-u-1-6">
+                    <a href="https://eprint.iacr.org/2019/675.pdf" target="_blank">
+                        <img class="pure-img u-icon-10" src="assets/images/paper.png" alt="protocol">Paper
+                    </a>
+                </div>
+                <div class="pure-u-1-6">
+                    <a href="https://github.com/nud3l/balance" target="_blank">
+                        <img class="pure-img u-icon-10" src="assets/images/git.png" alt="protocol">Code
+                    </a>
+                </div>
+                <div class="pure-u-1-3"></div>
+            </div>
+
+            <div class="pure-g">
+                <p></p>
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <div class="content">
+        <h2 class="content-subhead">Security through deposits</h2>
+        <p>
+            Cryptoeconomic protocols are ensuring security through deposits. 
+            If I want to participate in certain protocols, say <a href="https://makerdao.com/en/dai/" target="_blank">Dai</a> or <a href="https://truebit.io/" target="_blank">TrueBit</a>, I need to provide a cryptocurrency deposit.
+            Generally speaking, if I violate the requirements of the protocol, my deposit is either slashed or refunded to whomever I damaged by my actions.
+            This is also true, for example, for most Proof-of-Stake protocols:
+            I have to put up an amount of money as an insurance against misbehaviour.
+            The figure below illustrates the possible behaviour.
+        </p>
+        <p>
+            <img class="pure-img" src="assets/images/protocol.png" alt="protocol">
+        </p>
+        <p>
+            In the first step, I commit to a contract <b>A</b> by depositing some cryptocurrency.
+            Next, I can decide if I want to execute a "desired action" or an "undesired action".
+            For example, would I provide a correct result in a computation in a protocol like TrueBit or maintain my deposits above
+            the liquidation threshold in Dai.
+            If I behave correctly, I typically get rewarded with a payment and if I misbehave, I get punished.
+        </p>
+
+        <h2 class="content-subhead">But how much deposit do I need?</h2>
+        <p>
+            The problem is: no one really knows how much deposit you actually need in a wide range of protocols.
+            As the USD to Ether value is volatile, it is unclear much deposit is actually needed for the CDP in Dai.
+            Hence, you see the deposit level <a href="https://mkr.tools/system">fluctuating from 350% to 600%</a>.
+            Also, how much a computation is worth is very subjective to the service provider and the receiver of the result.
+            We can say there are two sources of uncertainty:
+        </p>
+        <ul>
+            <li><b>Private information:</b> These are unknown values that different parties assign to a certain outcome. For example, a solver of a computation might just value the result by the payment he gets. The receiver of the result might require it for a critical application and hence assign a much higher value to it.</li>
+            <li><b>Event-dependency:</b> These are values that change over time in an unpredictable manner. For example, the USD to Ether exchange rate in exactly 26 days is practically impossible to forecast.</li>
+        </ul>
+
+        <p>
+            Because of these sources of uncertainty, protocol designer need to require more deposit than the current risk.
+            They need to anticipate different private information and future events to ensure their protocol <b>remains secure over time</b>.
+        </p>
+
+        <h2 class="content-subhead">Balance: Reducing deposits with the same level of security</h2>
+        <p>
+            Enter Balance: a protocol that allows you to reduce these deposits securely.
+            We now know that we need to over-collateralize if we have private information and event-dependency.
+            However, we can <b>reduce deposits over time while keeping the same level of protection</b>.
+            We achieve this by assigning agents to layers that represent a certain level of deposit.
+            An agent can be any users or organization in a protocol and is identified by its public key.
+            Simply speaking, it works like this:
+        </p>
+        <p>
+            <img class="pure-img" src="assets/images/TCR.png" alt="tcr">
+        </p>
+        <p>
+            An agent starts at <b>Layer 1</b> when the agent first commits to the protocol. 
+            So for example, I would start with a deposit factor of 2.0 at first, requiring 200% collateral.
+            When I perform desired action, I can move to <b>Layer 2</b> and reduce my deposit factor to 1.75.
+            Hence, I just reduced my collateral factor by 25 percentage points!
+            I keep doing desired actions until I make it to the <b>highest layer</b> with the <b>lowest deposit</b> factor.
+        </p>
+
+        <p>
+            <img class="pure-img" src="assets/images/TCR_utility.png" alt="tcr">
+        </p>
+
+        <p>
+            The higher I move up the layers, the more difficult it becomes to maintain my position.
+            At the same time, my <b>utility</b> gets higher since I need to lock less deposit to participate in the protocol.
+        </p>
+
+        <h2 class="content-subhead">Less deposit and the same security?</h2>
+        <p>
+            Balance allows agents to reduce their capital deposits over a sequence of periodic rounds, while preventing the
+            addition of incentives to act maliciously.
+            In fact, malicious agents that aim to misbehave in a protocol obtain more utility if they do early on, before any
+            reductions in their deposit occurs.
+            Conversely, honest and rational agents receive a higher utility by <b>consistently</b> acting in the interest of the
+            protocol.
+            Balance achieves this property for protocols which feature over-collateralization by reducing deposits to a lower
+            bound.
+            Above the lower bound, the <b>additional</b> utility gained from reducing the deposit is <b>less</b> than the
+            opportunity cost for locking-up the deposit in the first place.
+            Hence, a malicious agent gains no additional utility from cheating in a later round with a reduced deposit.
+            However, honest and rational agents gain additional utility by reducing the opportunity cost of the locked deposit.
+        </p>
+
+        <h2 class="content-subhead">Reducing deposits is restricted to a boundary</h2>
+        <p>
+            Unfortunately, we cannot reduce deposits indefinitely.
+            Generally speaking, the reduction depends on parameters like the total number of layers and the expected opportunity cost for locking deposits.
+            We can illustrate this with the figure below:
+        </p>
+
+        <p>
+            <img class="pure-img" src="assets/images/decision_basefactor.png" alt="decision">
+        </p>
+
+        <p>
+            The higher the initial deposit factor, the more we can reduce the deposit factor up to a certain bound.
+            Each of the five curves above represent the boundary with a starting deposit level ranging from 1.0 to 2.0.
+            As long as the deposit level is set <b>above the boundary, we enjoy the same level of security</b>.
+            If we set the deposit factor below the boundary, the protocol will be less secure.
+        </p>
+
+        <h2 class="content-subhead">Applying Balance to XCLAIM</h2>
+        <p>
+            We integrate Balance with <a href="https://www.xclaim.io/" target="_blank">XCLAIM</a>.
+            XCLAIM is a protocol that allows secure, trustless, and efficient cross-chain interoperability between any pair of blockchains.
+            In XCLAIM, over-collateralization is required due to the volatility of the cryptocurrencies of the connected chains.
+            With Balance, we can reduce this by 10% and maintain the same level of security.
+        </p>
+
+        <p>
+            <img class="pure-img" src="assets/images/xclaim.png" alt="decision">
+        </p>
+
+
+
+        <!-- <h2 class="content-subhead">Great, where can I learn more?</h2>
+        <p>
+            We prove formally that the security claims are correct and discuss a range of attacks like Sybil identities and a strategy called "Layer-Cycling" in our paper.
+            Please go ahead and <a href="https://eprint.iacr.org/2019/675.pdf" target="_blank">read the paper!</a>.
+            There is also a <a href="https://github.com/nud3l/balance" target="_blank">proof-of-concept implementation in Solidity available.</a>
+        </p> -->
+
+    </div>
+
+    <div class="content">
+        <p style="font-size: 70%">
+            Built with <a href="https://purecss.io/">Pure</a>,
+            Icons made by:
+            <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a
+                href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a
+                href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0"
+                target="_blank">CC 3.0 BY</a>,
+            <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a
+                href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a
+                href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0"
+                target="_blank">CC 3.0 BY</a>,
+            <a href="https://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a>
+            from
+            <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a
+                href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0"
+                target="_blank">CC 3.0
+                BY</a>.
+        </p>
+    </div>
+</body>
