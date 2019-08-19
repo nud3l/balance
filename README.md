@@ -7,30 +7,16 @@
 
 # Dynamic Collateral Adjustments
 
-We are introducing a mechanism to dynamically adjust collateral in the case of external events depending on the contributions of agents towards a cryptoeconomic layer 2 protocol. The mechanism design philosophy is borrowed from [Layered Token Curated Registry (TCR)](https://blog.oceanprotocol.com/the-layered-tcr-56cc5b4cdc45). However, we make significant changes to the idea of the registry. The idea is that agents are assigned to layers based on their actions, which in turn determine the amount of collateral they have to provide. The more "desired" actions an agent performs, the less collateral the agent has to provide to participate in the protocol.
+We are introducing a mechanism to dynamically adjust deposits in the case of external events depending on the contributions of agents towards a cryptoeconomic layer 2 protocol. The mechanism design philosophy is borrowed from [Layered Token Curated Registry (TCR)](https://blog.oceanprotocol.com/the-layered-tcr-56cc5b4cdc45). However, we make significant changes to the idea of the registry. The idea is that agents are assigned to layers based on their actions, which in turn determine the amount of collateral they have to provide. The more "desired" actions an agent performs, the less collateral the agent has to provide to participate in the protocol.
 
+# Protocol Overview
 
-## Problem
+A general protocol overview can be found [here](https://balance-resear.ch). The details and security proofs can be found in the [paper](https://eprint.iacr.org/2019/675.pdf).
 
-Layer 2 protocols on Ethereum typically use collateral to prevent agents to misbehave.
-This includes for example Plasma, payment channels (Raiden, PERUN), verifiable computation (TrueBit) or cross-chain protocols like XClaim.
-There are two problems with the current approach to collateral:
-
-- **Unknown risk:** In protocols like TrueBit the risk of a solver providing a wrong solution is non-trivial to quantify. It depends on the subjective importance of the computation to be correct. Hence, it is not possible to set an objectively *correct* amount of collateral.
-- **Dependency on outside events**: The amount of collateral provided is constant for some time period `t`. In case of outside events, there exists no incentive to update the collateral. Hence, the collateral needs to take any future events into account and needs to be higher in anticipation of such events.
-
-## Verifiable Layered TCR
-
-The idea of a Verifiable Layered TCR (VLTCR) is to assign agents into layers based on their actions.
-A cryptoeconomic protocol has in an abstract sense a list of desired and undesired actions.
-In case an agent performs an undesired action, its collateral is usually "slashed", i.e. the collateral is destroyed or the "victim" of the undesired action is refunded with that collateral. 
-Contrary, if the agent performs a desired action, it is usually rewarded with a fee that the consumer of the service is paying (e.g. a solver in TrueBit). 
-However, this is a black and white option.
-
-### Basic feedback mechanism 
+<!-- ### Basic feedback mechanism 
 *What if we could make use of this action classification to build a feedback mechanism?*
 
-Assume you are receiving points as an agent if you perform agents that are part of the desired actions.
+Assume you are receiving points as an agent if you perform actions that are part of the desired actions.
 The smart contract implementing the protocol is aware of all these actions.
 Thereby, the agents actions are directly translated into a score for performing this action.
 
@@ -46,8 +32,8 @@ We need to define a minimum base-line for the collateral for the highest layer. 
 These functions solve the problem of over-collateralisation. Agents that contribute to the protocol require less additional collateral. To summarize:
 
 - Collateral can be set according to layers. This will be defined in a smart contract that implements the LTCR.
-- The cryptoeconomic protocol votes on the agents rank as the agents performs actions within the protocol.
-
+- The cryptoeconomic protocol votes on the agents rank as the agents performs actions within the protocol. -->
+<!-- 
 ### Concerning outside events
 *What happens if an outside event occurs and the collateral becomes to small?*
 
@@ -59,16 +45,16 @@ if they are not performing this, they receive negative points.
 
 To summarize:
 
-- Outside events can trigger the demand for special actions that require the agents to increase their collateral. Fulfilling this request brings points. Refusal deducts points. 
+- Outside events can trigger the demand for special actions that require the agents to increase their collateral. Fulfilling this request brings points. Refusal deducts points.  -->
 
-### Periodic updates to the registry
+<!-- ### Periodic updates to the registry
 **How are agents sorted into layers?**
 
 The VLTCR smart contract maintains the registry.
 Agents can collect points that determine if they:
 
 1. Stay in the same layer.
-2. Get promoted into the next layer.
+2. Get promoted to the next layer.
 3. Get demoted to the previous layer.
 4. Get removed from the registry.
 
@@ -81,8 +67,8 @@ To summarize:
 
 - Over a period `t` agents perform actions that can receive points. Those are recorded in the LTCR. 
 - At the end of the period, agents can be promoted to the next layer, stay in the same layer, or get demoted to the previous layer.
-- At the end of the period, scores are set to 0 for every agent.
-
+- At the end of the period, scores are set to 0 for every agent. -->
+<!-- 
 ## Desired properties
 
 We have a couple of desired properties:
@@ -102,11 +88,14 @@ We have a couple of desired properties:
   - Collateral factor (max, min, mean, median)
   - desired actions
 - Can we theoretically calculate/prove properties like Nash equilibria or social welfare?
-- ...?
+- ...? -->
 
 # Installation
 
-Make sure you have a recent version of `truffle` and `ganache-cli` installed as global packages.
+Make sure you have a recent version of `truffle` and `ganache-cli` installed as global packages. If not, install them with:
+```
+npm - g install truffle ganache-cli
+```
 
 Install the node dependencies with: 
 ```
