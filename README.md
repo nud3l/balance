@@ -5,11 +5,11 @@
  https://opensource.org/licenses/MIT
 -->
 
-# Dynamic Collateral Adjustments
+# Balance: Dynamic Collateral Adjustments
 
 We are introducing a mechanism to dynamically adjust deposits in the case of external events depending on the contributions of agents towards a cryptoeconomic layer 2 protocol. The mechanism design philosophy is borrowed from [Layered Token Curated Registry (TCR)](https://blog.oceanprotocol.com/the-layered-tcr-56cc5b4cdc45). However, we make significant changes to the idea of the registry. The idea is that agents are assigned to layers based on their actions, which in turn determine the amount of collateral they have to provide. The more "desired" actions an agent performs, the less collateral the agent has to provide to participate in the protocol.
 
-# Protocol Overview
+# Balance Overview
 
 A general protocol overview can be found [here](https://balance-resear.ch). The details and security proofs can be found in the [paper](https://eprint.iacr.org/2019/675.pdf).
 
