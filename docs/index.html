@@ -71,22 +71,30 @@
     <div class="content">
         <h2 class="content-subhead">Security through deposits</h2>
         <p>
-            Cryptoeconomic protocols are ensuring security through deposits. 
-            If I want to participate in certain protocols, say <a href="https://makerdao.com/en/dai/" target="_blank">Dai</a> or <a href="https://truebit.io/" target="_blank">TrueBit</a>, I need to provide a cryptocurrency deposit.
-            Generally speaking, if I violate the requirements of the protocol, my deposit is either slashed or refunded to whomever I damaged by my actions.
-            This is also true, for example, for most Proof-of-Stake protocols:
+            Cryptoeconomic protocols are ensuring security through deposits.
+            This includes for example stablecoins like <a href="https://makerdao.com/en/dai/" target="_blank">Dai</a>, <a href="https://www.plasma.io/plasma-contracts.html">Plasma</a>, payment channels (<a href="https://raiden.network/">Raiden</a>, <a href="https://eprint.iacr.org/2017/635">PERUN</a>), verifiable computation (<a href="https://truebit.io/" target="_blank">TrueBit</a>) or cross-chain
+            protocols like <a href="https://www.xclaim.io/" target="_blank">XCLAIM</a>.
+            If an agent Alice wants to participate in these protocols, Alice needs to provide a cryptocurrency deposit as an insurance against misbehaviour.
+            Generally speaking, if Alice violates the requirements of the protocol, her deposit is either slashed or transferred to the agent that was damaged by the action.
+            A cryptoeconomic protocol has, in an abstract sense, a list of desired and undesired actions.
+            <!-- This is also true, for example, for most Proof-of-Stake protocols:
             I have to put up an amount of money as an insurance against misbehaviour.
-            The figure below illustrates the possible behaviour.
+            The figure below illustrates the possible behaviour. -->
         </p>
         <p>
             <img class="pure-img" src="assets/images/protocol.png" alt="protocol">
         </p>
         <p>
-            In the first step, I commit to a contract <b>A</b> by depositing some cryptocurrency.
-            Next, I can decide if I want to execute a "desired action" or an "undesired action".
-            For example, would I provide a correct result in a computation in a protocol like TrueBit or maintain my deposits above
+            In the first step, Alice commit to a contract <b>A</b> by depositing some cryptocurrency.
+            Next, Alice can decide if she want to execute a "desired action" or an "undesired action".
+            In case Alice performs an undesired action, her deposit is usually "slashed", i.e. the collateral is destroyed or the
+            "victim" of the undesired action is refunded with that collateral.
+            Contrary, if Alice performs a desired action, she is usually rewarded with a fee that the consumer of the service is
+            paying (e.g. a solver in TrueBit).
+            <!-- For example, would Alice provide a correct result in a computation in a protocol like TrueBit or maintain her deposits above
             the liquidation threshold in Dai.
-            If I behave correctly, I typically get rewarded with a payment and if I misbehave, I get punished.
+            If Alice behaves correctly, Alice typically gets rewarded with a payment.
+            If Alice misbehaves, Alice gets punished. -->
         </p>
 
         <h2 class="content-subhead">But how much deposit do I need?</h2>
@@ -127,6 +135,17 @@
             I keep doing desired actions until I make it to the <b>highest layer</b> with the <b>lowest deposit</b> factor.
         </p>
 
+        <h2 class="content-subhead">Feedback mechanism</h2>
+        <p>
+        
+            Assume you are receiving points as an agent if you perform actions that are part of the desired actions.
+            The smart contract implementing the protocol is aware of all these actions.
+            Thereby, the agents actions are directly translated into a score for performing this action.
+        
+            The more contributions the higher the ranking. The higher the ranking, the less collateral the agent has to provide.
+            We end up with a construct like this:
+        </p>
+        
         <p>
             <img class="pure-img" src="assets/images/TCR_utility.png" alt="tcr">
         </p>
@@ -168,6 +187,30 @@
             Each of the five curves above represent the boundary with a starting deposit level ranging from 1.0 to 2.0.
             As long as the deposit level is set <b>above the boundary, we enjoy the same level of security</b>.
             If we set the deposit factor below the boundary, the protocol will be less secure.
+        </p>
+
+        <h2 class="content-subhead">Balance in detail</h2>
+        <p>
+            Balance is implemented as a smart contract and can be integrated with existing cryptoeconomic protocols.
+            Agents collect points that add up to their score within a single period.
+            After the end of the period, the agents are curated to layers depending on their current score and their current layer.
+            They can either:
+        </p>
+
+        <ul>
+            <li> Stay in the same layer. </li>
+            <li> Get promoted to the next layer. </li>
+            <li> Get demoted to the previous layer.</li>
+            <li> Get removed from the registry. </li>
+        </ul>
+
+        <p>
+            The idea is to set a fixed amount of time or events in which agents can collect these points.
+            At `t_0`, each agent starts with 0 points. Each layer defines a lower and upper bound.
+            If an agent manages to collect enough points to make the cut of the *current* layer (its upper bound), then the agent
+            gets promoted to that layer at `t_1`. If the agent falls below the lower bound of the *current* layer, it gets demoted
+            to the previous layer.
+            At the end of the period, scores are reset and the agent starts from 0 again.
         </p>
 
         <h2 class="content-subhead">Applying Balance to XCLAIM</h2>
